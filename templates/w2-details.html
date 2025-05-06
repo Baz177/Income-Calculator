@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>W2 Income Details</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f9;
+            text-align: center;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: inline-block;
+        }
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        label {
+            font-size: 16px;
+            display: block;
+            margin-bottom: 5px;
+        }
+        select, input[type="number"] {
+            padding: 8px;
+            width: 200px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        input[type="hidden"] {
+            display: none;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        .error {
+            color: red;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>W2 Income Details</h1>
+    <div class="container">
+        <form id="w2DetailsForm" method="POST" action="/w2-details">
+            <div class="form-group">
+                <label>Start Date: <span id="startDate"></span></label>
+            </div>
+            <div class="form-group">
+                <label for="incomeType">Income Type:</label>
+                <select id="incomeType" name="incomeType" required>
+                    <option value="" disabled selected>Select income type</option>
+                    <option value="hourly">Hourly</option>
+                    <option value="weekly">Weekly</option>
+                    <option value="biweekly">Biweekly</option>
+                    <option value="monthly">Monthly</option>
+                    <option value="annual">Annual</option>
+                </select>
+            </div>
+            <div id="hourlyInputs" class="form-group hidden">
+                <label for="hourlyRate">Hourly Rate (USD):</label>
+                <input type="number" id="hourlyRate" name="hourlyRate" min="0" step="0.01" placeholder="Enter hourly rate">
+                <label for="hoursPerWeek">Hours per Week:</label>
+                <input type="number" id="hoursPerWeek" name="hoursPerWeek" min="0" step="0.1" placeholder="Enter hours per week">
+            </div>
+            <div id="weeklyInput" class="form-group hidden">
+                <label for="weeklyRate">Weekly Rate (USD):</label>
+                <input type="number" id="weeklyRate" name="weeklyRate" min="0" step="0.01" placeholder="Enter weekly rate">
+            </div>
+            <div id="biweeklyInput" class="form-group hidden">
+                <label for="biweeklyRate">Biweekly Rate (USD):</label>
+                <input type="number" id="biweeklyRate" name="biweeklyRate" min="0" step="0.01" placeholder="Enter biweekly rate">
+            </div>
+            <div id="monthlyInput" class="form-group hidden">
+                <label for="monthlyRate">Monthly Rate (USD):</label>
+                <input type="number" id="monthlyRate" name="monthlyRate" min="0" step="0.01" placeholder="Enter monthly rate">
+            </div>
+            <div id="annualInput" class="form-group hidden">
+                <label for="annualRate">Annual Rate (USD):</label>
+                <input type="number" id="annualRate" name="annualRate" min="0" step="0.01" placeholder="Enter annual rate">
+            </div>
+            <input type="hidden" id="year" name="year">
+            <input type="hidden" id="month" name="month">
+            <input type="hidden" id="day" name="day">
+            <button type="submit" id="submitButton" disabled>Submit</button>
+        </form>
+    </div>
+
+    <script>
+        const form = document.getElementById('w2DetailsForm');
+        const submitButton = document.getElementById('submitButton');
+        const incomeTypeSelect = document.getElementById('incomeType');
+        const hourlyInputs = document.getElementById('hourlyInputs');
+        const weeklyInput = document.getElementById('weeklyInput');
+        const biweeklyInput = document.getElementById('biweeklyInput');
+        const monthlyInput = document.getElementById('monthlyInput');
+        const annualInput = document.getElementById('annualInput');
+        const hourlyRateInput = document.getElementById('hourlyRate');
+        const hoursPerWeekInput = document.getElementById('hoursPerWeek');
+        const weeklyRateInput = document.getElementById('weeklyRate');
+        const biweeklyRateInput = document.getElementById('biweeklyRate');
+        const monthlyRateInput = document.getElementById('monthlyRate');
+        const annualRateInput = document.getElementById('annualRate');
+        const startDateSpan = document.getElementById('startDate');
+        const yearInput = document.getElementById('year');
+        const monthInput = document.getElementById('month');
+        const dayInput = document.getElementById('day');
+
+        // Get start date from URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const year = urlParams.get('year');
+        const month = urlParams.get('month');
+        const day = urlParams.get('day');
+        const startDate = year && month && day ? `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}` : 'Not provided';
+
+        // Display start date and set hidden inputs
+        startDateSpan.textContent = startDate;
+        if (year && month && day) {
+            yearInput.value = year;
+            monthInput.value = month;
+            dayInput.value = day;
+        }
+
+        // Toggle input fields based on income type
+        incomeTypeSelect.addEventListener('change', () => {
+            hourlyInputs.classList.add('hidden');
+            weeklyInput.classList.add('hidden');
+            biweeklyInput.classList.add('hidden');
+            monthlyInput.classList.add('hidden');
+            annualInput.classList.add('hidden');
+            hourlyRateInput.removeAttribute('required');
+            hoursPerWeekInput.removeAttribute('required');
+            weeklyRateInput.removeAttribute('required');
+            biweeklyRateInput.removeAttribute('required');
+            monthlyRateInput.removeAttribute('required');
+            annualRateInput.removeAttribute('required');
+
+            if (incomeTypeSelect.value === 'hourly') {
+                hourlyInputs.classList.remove('hidden');
+                hourlyRateInput.setAttribute('required', 'required');
+                hoursPerWeekInput.setAttribute('required', 'required');
+            } else if (incomeTypeSelect.value === 'weekly') {
+                weeklyInput.classList.remove('hidden');
+                weeklyRateInput.setAttribute('required', 'required');
+            } else if (incomeTypeSelect.value === 'biweekly') {
+                biweeklyInput.classList.remove('hidden');
+                biweeklyRateInput.setAttribute('required', 'required');
+            } else if (incomeTypeSelect.value === 'monthly') {
+                monthlyInput.classList.remove('hidden');
+                monthlyRateInput.setAttribute('required', 'required');
+            } else if (incomeTypeSelect.value === 'annual') {
+                annualInput.classList.remove('hidden');
+                annualRateInput.setAttribute('required', 'required');
+            }
+            updateSubmitButton();
+        });
+
+        // Enable/disable submit button based on input validity
+        function updateSubmitButton() {
+            let isValid = false;
+            if (incomeTypeSelect.value === 'hourly') {
+                isValid = hourlyRateInput.value > 0 && hoursPerWeekInput.value > 0;
+            } else if (incomeTypeSelect.value === 'weekly') {
+                isValid = weeklyRateInput.value > 0;
+            } else if (incomeTypeSelect.value === 'biweekly') {
+                isValid = biweeklyRateInput.value > 0;
+            } else if (incomeTypeSelect.value === 'monthly') {
+                isValid = monthlyRateInput.value > 0;
+            } else if (incomeTypeSelect.value === 'annual') {
+                isValid = annualRateInput.value > 0;
+            }
+            submitButton.disabled = !isValid;
+        }
+
+        // Add input listeners for real-time validation
+        [hourlyRateInput, hoursPerWeekInput, weeklyRateInput, biweeklyRateInput, monthlyRateInput, annualRateInput].forEach(input => {
+            input.addEventListener('input', updateSubmitButton);
+        });
+    </script>
+</body>
+</html>
