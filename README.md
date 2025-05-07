@@ -1,5 +1,7 @@
 # Income Calculator
 
+https://income-calculator-7rn7.onrender.com/ 
+
 The Income Calculator is a Flask-based web application that calculates Gross Monthly Income (GMI) for W2 and 1099 income types. It supports Year-to-Date (YTD) income, detailed income breakdowns (e.g., hourly, weekly, monthly rates), and a three-month average for 1099 income, making it ideal for financial affidavits or eligibility assessments (e.g., meeting 125% Federal Poverty Guideline thresholds).
 
 # Table of Contents
