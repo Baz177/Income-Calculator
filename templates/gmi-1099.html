@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GMI Calculation Result</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px; /* Increased from 800px to occupy more space */
+            margin: 0 auto;
+            padding: 30px; /* Increased padding for breathing room */
+            background-color: #f4f4f9;
+            text-align: center;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 30px; /* Slightly increased for better spacing */
+            font-size: 2.5em; /* Larger heading for prominence */
+        }
+        .container {
+            background: white;
+            padding: 40px; /* Increased padding for larger appearance */
+            border-radius: 10px; /* Slightly larger radius for aesthetics */
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15); /* Stronger shadow for depth */
+            width: 100%; /* Full width of parent (body) */
+            box-sizing: border-box; /* Ensures padding doesn't overflow */
+        }
+        .result-group {
+            margin-bottom: 30px; /* Increased for spacing */
+            text-align: left;
+        }
+        .result-group p {
+            font-size: 18px; /* Larger font size for readability */
+            margin: 8px 0; /* Slightly increased margin */
+        }
+        .error {
+            color: red;
+            font-size: 18px; /* Match result-group font size */
+        }
+        .return-button {
+            padding: 12px 30px; /* Larger button for prominence */
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 6px; /* Slightly larger radius */
+            font-size: 18px; /* Larger font size */
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: background-color 0.3s;
+        }
+        .return-button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>GMI Calculation Result</h1>
+    <div class="container">
+        {% if error %}
+            <p class="error">Error: {{ error }}</p>
+        {% else %}
+            <div class="result-group">
+                <p><strong>Gross Monthly Income (GMI):</strong> ${{ result.gmi | format_currency }}</p>
+                <p>{{ result.message }}</p>
+            </div>
+        {% endif %}
+        <a href="/" class="return-button">Return to Home</a>
+    </div>
+</body>
+</html>
